@@ -1,0 +1,212 @@
+//Alunos: Thiago Valentin e Carlos Eduardo Gouveia Cabral
+//Exercicio 1
+
+#include <stdio.h>
+#include <stdlib.h>
+ 
+ int **alocar(int n, int m, int p, int q) {
+    int **matriz;
+    int i, j, k;
+
+
+
+    matriz = (int**)malloc(n * sizeof(int***));
+    for (i = 0; i < n; i++){
+
+        matriz[i] = (int *)malloc(m * sizeof(int **));
+        for (j=0; j < m; j++ ){
+            matriz[i][j] = (int **)malloc(p * sizeof(int *));
+            for (k = 0; k < p; k++) {
+                matriz[i][j][k] = (int *)malloc(q * sizeof(int));
+            }
+
+        }
+
+    }
+
+    return matriz ;
+
+  }
+
+  void liberar(int **matriz, int n, int m, int p) {
+    int i, j, k;
+
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < m; j++) {
+            for (k = 0; k < p; k++) {
+                free(matriz[i][j][k]);
+            }
+            free(matriz[i][j]);
+        }
+        free(matriz[i]);
+    }
+
+    free(matriz);
+}
+
+int main(){
+int n,m,p,q;
+int **matriz;
+int i,j,k,l;
+
+  printf("Digite o valor de n: ");
+    scanf("%d", &n);
+  printf("Digite o valor de m: ");
+    scanf("%d", &m);
+  printf("Digite o valor de p: ");
+    scanf("%d", &p); 
+  printf("Digite o valor de q: ");
+    scanf("%d", &q);
+
+  matriz = alocar(n, m, p, q);
+
+  for (i = 0; i < n; i++) {
+        for (j = 0; j < m; j++) {
+            for (k = 0; k < p; k++) {
+                for (l = 0; l < q; l++) {
+                    printf("%d ", matriz[i][j][k][l]);
+                }
+                printf("\n");
+            }
+            printf("\n");
+        }
+        printf("\n");
+    }
+
+    liberar(matriz, n, m, p);
+
+    return 0;
+}
+
+--------------------------------------------------------------------------------------------------------------]
+// Nome da dupla: Thiago Valentin e Carlos Eduardo Gouveia
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <locale.h>
+
+#define max_alunos 60
+#define max_notas 3
+
+typedef struct {
+    int matricula;
+    char nome[70];
+    float notas[max_notas];
+    float media;
+} Aluno;
+
+void cadastrarAluno(Aluno alunos[], int *numAlunos);
+void vincularNotas(Aluno alunos[], int numAlunos);
+void calcularMediaTurma(Aluno alunos[], int numAlunos);
+void imprimirResultados(Aluno alunos[], int numAlunos);
+
+int main() {
+    setlocale(LC_ALL, "Portuguese");
+    Aluno alunos[max_alunos];
+    int numAlunos = 0;
+    char escolha;
+
+    do {
+        printf("\n==== Menu ====\n");
+        printf("1 - Cadastrar aluno\n");
+        printf("2 - Vincular Nota\n");
+        printf("3 - Calcular Média da Turma\n");
+        printf("4 - Imprimir Resultados\n");
+        printf("0 - Sair\n");
+        printf("Escolha uma opção: ");
+        scanf(" %c", &escolha);
+
+        switch (escolha) {
+            case '1':
+                cadastrarAluno(alunos, &numAlunos);
+                break;
+            case '2':
+                vincularNotas(alunos, numAlunos);
+                break;
+            case '3':
+                calcularMediaTurma(alunos, numAlunos);
+                break;
+            case '4':
+                imprimirResultados(alunos, numAlunos);
+                break;
+            case '0':
+                printf("Terminando a sessão!\n");
+                break;
+            default:
+                printf("Essa escolha não está disponível, tente outra vez.\n");
+        }
+    } while (escolha != '0');
+
+    return 0;
+}
+
+void cadastrarAluno(Aluno alunos[], int *numAlunos) {
+    if (*numAlunos == max_alunos) {
+        printf("Já tem mais alunos que presos na cadeia, estourou o limite!\n");
+        return;
+    }
+
+    Aluno novoAluno;
+
+    printf("\n=== Registrar novo pateta (Aluno) ===\n");
+    printf("Matrícula: ");
+    scanf("%d", &novoAluno.matricula);
+    printf("Nome: ");
+    scanf(" %[^\n]s", novoAluno.nome);
+
+    alunos[*numAlunos] = novoAluno;
+    (*numAlunos)++;
+
+    printf("Aluno registrado!\n");
+}
+
+void vincularNotas(Aluno alunos[], int numAlunos) {
+    int matricula, i;
+
+    printf("\n=== Vincular as notas ===\n");
+    printf("Digite a matrícula do pateta: ");
+    scanf("%d", &matricula);
+
+    for (i = 0; i < numAlunos; i++) {
+        if (alunos[i].matricula == matricula) {
+            int j;
+            for (j = 0; j < max_notas; j++) {
+                printf("Digite a nota %d do aluno: ", j + 1);
+                scanf("%f", &alunos[i].notas[j]);
+            }
+            printf("Notas vinculadas com sucesso.\n");
+            return;
+        }
+    }
+
+    printf("Aluno não encontrado.\n");
+}
+
+void calcularMediaTurma(Aluno alunos[], int numAlunos) {
+    int i, j;
+    for (i = 0; i < numAlunos; i++) {
+        float soma = 0;
+        for (j = 0; j < max_notas; j++) {
+            soma += alunos[i].notas[j];
+        }
+        alunos[i].media = soma / max_notas;
+    }
+
+    printf("Médias da turma calculadas.\n");
+}
+
+void imprimirResultados(Aluno alunos[], int numAlunos) {
+    printf("\n=== Resultados ===\n");
+    int i;
+    for (i = 0; i < numAlunos; i++) {
+        printf("Aluno: %s\n", alunos[i].nome);
+        printf("Média: %.2f\n", alunos[i].media);
+        if (alunos[i].media > 6) {
+            printf("Situação: Aprovado\n");
+        } else {
+            printf("Situação: Reprovado\n");
+        }
+        printf("\n");
+    }
+}
